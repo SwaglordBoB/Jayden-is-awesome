@@ -325,10 +325,11 @@
             </table>
           </div>
         </div>
-        </div>
+      </div>
 
-        <!-- Main Daily Agenda View (Today's Schedule) -->
-        <div class="glass-card calendar-card" id="workspace-daily" style="display: none;">
+    <!-- Main Daily Agenda View (Today's Schedule) -->
+    <div id="stage-daily-wrapper" class="stage-panel">
+      <div class="glass-card calendar-card" id="workspace-daily">
           <div class="calendar-header">
             <div class="calendar-title-group">
               <h2 id="daily-greeting">Good morning, Ellen!</h2>
@@ -373,6 +374,14 @@
               <div class="timeline-scroll" id="daily-timeline-list" style="overflow-y: auto; display: flex; flex-direction: column; gap: 1.2rem; padding-right: 0.5rem;">
                 <!-- Dynamic timeline items -->
               </div>
+            </div>
+          </div>
+
+          <!-- Starting Soon Alert Banner -->
+          <div id="soon-alert-banner" class="soon-alert" style="display: none;">
+            <div class="soon-alert-inner">
+              <span class="soon-icon"><i class="fa-solid fa-bell"></i></span>
+              <span id="soon-alert-text">Class starting soon!</span>
             </div>
           </div>
 
@@ -424,7 +433,7 @@
           </div>
           <div class="form-group">
             <label class="form-label" for="modal-emoji">Emoji Icon</label>
-            <input type="text" id="modal-emoji" class="input-control" placeholder="✏️" readonly style="cursor: pointer;">
+            <input type="text" id="modal-emoji" class="input-control" placeholder="✏️" readonly id="modal-emoji" style="cursor: pointer;" title="Click to pick an emoji">
             <!-- Simple Popover of common icons -->
             <div class="emoji-picker-container" id="emoji-picker">
               <div class="emoji-option" data-emoji="📚">📚</div>
