@@ -1115,3 +1115,195 @@ header {
     color: black !important;
   }
 }
+
+/* ==========================================
+   DAILY DASHBOARD & AGENDA STYLES
+   ========================================== */
+.daily-dashboard-grid {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+.active-class-card {
+  transition: var(--transition-smooth);
+}
+.active-class-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(var(--accent-primary-rgb), 0.35) !important;
+  box-shadow: 0 12px 40px 0 rgba(var(--accent-primary-rgb), 0.18) !important;
+}
+
+@keyframes pulse-active {
+  0% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(var(--accent-primary-rgb), 0.4); }
+  50% { transform: scale(1.1); opacity: 0.7; box-shadow: 0 0 0 8px rgba(var(--accent-primary-rgb), 0); }
+  100% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(var(--accent-primary-rgb), 0); }
+}
+
+.timeline-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+.timeline-scroll::-webkit-scrollbar-thumb {
+  background: var(--glass-border);
+  border-radius: 4px;
+}
+
+.timeline-item {
+  display: flex;
+  gap: 1.25rem;
+  position: relative;
+}
+.timeline-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+.timeline-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--bg-tertiary);
+  border: 3px solid var(--glass-border);
+  z-index: 2;
+  transition: var(--transition-smooth);
+  margin-top: 0.8rem;
+}
+.timeline-dot.active {
+  background: var(--accent-primary);
+  border-color: white;
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+.timeline-dot.completed {
+  background: var(--text-muted);
+  border-color: var(--glass-border);
+}
+.timeline-dot.upcoming {
+  background: transparent;
+  border-color: var(--accent-secondary);
+}
+
+.timeline-line {
+  width: 2px;
+  background: var(--glass-border);
+  position: absolute;
+  top: 1.8rem;
+  bottom: -1.2rem;
+  left: 6px;
+  z-index: 1;
+}
+.timeline-item:last-child .timeline-line {
+  display: none;
+}
+
+.timeline-card {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--border-radius-md);
+  padding: 0.8rem 1.2rem;
+  transition: var(--transition-smooth);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.timeline-card:hover {
+  transform: translateX(6px);
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(var(--accent-primary-rgb), 0.25);
+}
+.timeline-card.active {
+  border-color: var(--glass-border-glow);
+  background: rgba(var(--accent-primary-rgb), 0.06);
+}
+.timeline-card.completed {
+  opacity: 0.6;
+}
+
+.timeline-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  margin-bottom: 0.15rem;
+}
+.timeline-time {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 500;
+}
+.timeline-loc {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  background: rgba(0,0,0,0.25);
+  padding: 0.25rem 0.6rem;
+  border-radius: 20px;
+  border: 1px solid var(--glass-border);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* ==========================================
+   LOCK SCREEN & PASSCODE SECURITY
+   ========================================== */
+.lock-card {
+  animation: slideUp 0.6s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.passcode-dots .dot {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 2px solid var(--glass-border);
+  transition: var(--transition-smooth);
+}
+.passcode-dots .dot.filled {
+  background: var(--accent-grad);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 12px var(--accent-glow);
+  transform: scale(1.15);
+}
+
+.pin-keypad .key-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--glass-border);
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-weight: 600;
+  transition: var(--transition-smooth);
+}
+.pin-keypad .key-btn:hover {
+  background: rgba(var(--accent-primary-rgb), 0.15);
+  border-color: var(--accent-primary);
+  transform: scale(1.08);
+}
+.pin-keypad .key-btn:active {
+  transform: scale(0.95);
+  background: rgba(var(--accent-primary-rgb), 0.25);
+}
+
+/* Wrong Passcode Shake Animation */
+@keyframes shake-fail {
+  0%, 100% { transform: translateX(0); }
+  15%, 45%, 75% { transform: translateX(-12px); }
+  30%, 60%, 90% { transform: translateX(12px); }
+}
+.shake-error {
+  animation: shake-fail 0.5s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+/* Cloud sync pulse effect */
+.pulse-dot {
+  animation: pulse-active 1.8s infinite ease-in-out;
+}
+
