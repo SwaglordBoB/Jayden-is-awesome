@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AeroSched // Visual Schedule Reader & Customizer</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body class="theme-midnight">
+
+  <!-- Floating Ambient Orbs -->
+  <div class="glow-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+  </div>
+
+  <div class="container">
+    <!-- Main Header -->
+    <header>
+      <div class="logo">
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+        <span>AeroSched</span>
+      </div>
+      <div class="header-meta">
+        <div class="user-badge" id="user-badge" style="display: none;">
+          <i class="fa-solid fa-user"></i>
+          <span id="badge-name">Ellen</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- ==========================================
+         STAGE 1: WELCOME & UPLOAD
+         ========================================== -->
+    <div id="stage-upload" class="stage-panel active">
+      <div class="welcome-grid">
+        <div class="welcome-info">
+          <h1>Transform Your <span>Schedule</span> Instantly</h1>
+          <p>Upload a screenshot or photo of your class, work, or gym roster. Our AI-assisted OCR extracts times, days, and event details into an interactive, beautifully customized calendar dashboard.</p>
+          
+          <div class="features-list">
+            <div class="feature-item">
+              <i class="fa-solid fa-bolt"></i>
+              <div>
+                <h4>Automated OCR Reading</h4>
+                <p>Read schedules directly from screen grabs or snaps.</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <i class="fa-solid fa-palette"></i>
+              <div>
+                <h4>Appealing Themes</h4>
+                <p>Swap styles from Dark Cyberpunk to sleek Emerald.</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <i class="fa-solid fa-sliders"></i>
+              <div>
+                <h4>100% Customizable</h4>
+                <p>Adjust blocks, drag times, edit subject colors & emojis.</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <i class="fa-solid fa-file-pdf"></i>
+              <div>
+                <h4>High-Quality PDF</h4>
+                <p>Export a clean vector PDF or printable sheet.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group" style="max-width: 400px;">
+            <label class="form-label" for="username-input">Enter Your Name</label>
+            <input type="text" id="username-input" class="input-control" placeholder="What should we call you?" value="Guest Planner">
+          </div>
+        </div>
+
+        <div class="glass-card upload-card">
+          <div id="dropzone" class="dropzone">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            <h3>Drag & Drop Schedule Image</h3>
+            <p>Supports PNG, JPG, or WEBP formats</p>
+            <input type="file" id="file-input" style="display: none;" accept="image/*">
+            <button class="btn btn-secondary" onclick="document.getElementById('file-input').click()">
+              <i class="fa-solid fa-folder-open"></i> Browse Files
+            </button>
+          </div>
+          <div class="upload-divider">
+            <span>OR</span>
+          </div>
+          <button id="btn-demo-start" class="btn btn-secondary btn-demo">
+            <i class="fa-solid fa-circle-play"></i> Try Instant Demo (One-Click)
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         STAGE 2: OCR PARSING & REVIEW
+         ========================================== -->
+    <div id="stage-parsing" class="stage-panel">
+      <!-- Loading Screen View -->
+      <div id="parsing-loader" class="glass-card loader-panel">
+        <div class="circular-progress" id="progress-ring">
+          <span class="progress-value" id="progress-pct">0%</span>
+        </div>
+        <h3 class="loader-status" id="loader-title">Initializing OCR Engine...</h3>
+        <p class="loader-substatus" id="loader-subtitle">Loading language files and spinning up OCR worker threads.</p>
+      </div>
+
+      <!-- Split Screen Edit Screen -->
+      <div id="parsing-review" class="review-grid" style="display: none;">
+        <!-- Left: Uploaded Image Preview -->
+        <div class="glass-card preview-container">
+          <h3 class="form-label" style="font-size: 1.1rem; margin-bottom: 0;"><i class="fa-solid fa-image"></i> Original Schedule Image</h3>
+          <div class="preview-image-wrapper">
+            <img id="review-img" src="" alt="Schedule Preview">
+          </div>
+          <button id="btn-reupload" class="btn btn-secondary" style="width: 100%;">
+            <i class="fa-solid fa-arrow-left"></i> Upload Different Image
+          </button>
+        </div>
+
+        <!-- Right: Parsed Events List Creator -->
+        <div class="glass-card parsed-table-container">
+          <div class="review-header">
+            <h2>Verify & Refine OCR Data</h2>
+            <p style="font-size: 0.85rem; color: var(--text-secondary);">We detected these slots. Double check and edit any fields below.</p>
+          </div>
+
+          <div class="table-scroll">
+            <table class="review-table" id="review-table">
+              <thead>
+                <tr>
+                  <th style="width: 30%;">Subject / Class</th>
+                  <th style="width: 20%;">Day</th>
+                  <th style="width: 22%;">Start Time</th>
+                  <th style="width: 22%;">End Time</th>
+                  <th style="width: 6%;"></th>
+                </tr>
+              </thead>
+              <tbody id="parsed-rows">
+                <!-- Rows will be injected dynamically -->
+              </tbody>
+            </table>
+          </div>
+
+          <div class="table-actions">
+            <button id="btn-add-row" class="btn btn-secondary">
+              <i class="fa-solid fa-plus"></i> Add Event Row
+            </button>
+            <button id="btn-compile-schedule" class="btn btn-primary">
+              Compile Visual Schedule <i class="fa-solid fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         STAGE 3: CALENDAR WORKSPACE DASHBOARD
+         ========================================== -->
+    <div id="stage-workspace" class="stage-panel">
+      <div class="workspace-layout">
+        <!-- Sidebar Controls -->
+        <div class="glass-card control-sidebar">
+          <div class="control-section">
+            <div class="control-title"><i class="fa-solid fa-palette"></i> Visual Theme</div>
+            <div class="theme-picker">
+              <div class="theme-option option-midnight active" data-theme="midnight">
+                <div class="theme-swatch"></div>
+                <span>Midnight</span>
+              </div>
+              <div class="theme-option option-cyberpunk" data-theme="cyberpunk">
+                <div class="theme-swatch"></div>
+                <span>Cyberpunk</span>
+              </div>
+              <div class="theme-option option-emerald" data-theme="emerald">
+                <div class="theme-swatch"></div>
+                <span>Emerald</span>
+              </div>
+              <div class="theme-option option-sunset" data-theme="sunset">
+                <div class="theme-swatch"></div>
+                <span>Sunset</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="control-section">
+            <div class="control-title"><i class="fa-solid fa-clock"></i> Hour Display</div>
+            <div class="toggle-grid">
+              <button class="toggle-btn active" id="btn-12h">12-Hour</button>
+              <button class="toggle-btn" id="btn-24h">24-Hour</button>
+            </div>
+          </div>
+
+          <div class="control-section">
+            <div class="control-title"><i class="fa-solid fa-text-height"></i> Text Size</div>
+            <div class="toggle-grid">
+              <button class="toggle-btn active" id="btn-size-normal">Normal</button>
+              <button class="toggle-btn" id="btn-size-large">Large</button>
+            </div>
+          </div>
+
+          <div class="control-section" style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <button id="btn-add-manual-event" class="btn btn-secondary" style="width: 100%;">
+              <i class="fa-solid fa-plus"></i> Add New Event
+            </button>
+            <button id="btn-clear-schedule" class="btn btn-danger" style="width: 100%;">
+              <i class="fa-solid fa-trash-can"></i> Reset Board
+            </button>
+            <button id="btn-back-to-upload" class="btn btn-secondary" style="width: 100%;">
+              <i class="fa-solid fa-upload"></i> Upload Roster
+            </button>
+          </div>
+        </div>
+
+        <!-- Main Calendar View -->
+        <div class="glass-card calendar-card" id="schedule-print-area">
+          <div class="calendar-header">
+            <div class="calendar-title-group">
+              <h2 id="calendar-title">Ellen's Custom Schedule</h2>
+              <p id="calendar-subtitle">Organized visual timeline // Auto-saved online</p>
+            </div>
+            <div class="calendar-actions-top">
+              <button id="btn-export-pdf" class="btn btn-primary">
+                <i class="fa-solid fa-file-pdf"></i> Export PDF
+              </button>
+            </div>
+          </div>
+
+          <!-- Weekly Schedule Grid Viewport -->
+          <div class="calendar-viewport">
+            <table class="calendar-table" id="calendar-grid">
+              <thead>
+                <tr>
+                  <th class="time-col-header">Time</th>
+                  <th class="day-header" data-day="1">Monday <span>Mon</span></th>
+                  <th class="day-header" data-day="2">Tuesday <span>Tue</span></th>
+                  <th class="day-header" data-day="3">Wednesday <span>Wed</span></th>
+                  <th class="day-header" data-day="4">Thursday <span>Thu</span></th>
+                  <th class="day-header" data-day="5">Friday <span>Fri</span></th>
+                  <th class="day-header" data-day="6">Saturday <span>Sat</span></th>
+                  <th class="day-header" data-day="7">Sunday <span>Sun</span></th>
+                </tr>
+              </thead>
+              <tbody id="calendar-rows">
+                <!-- Dynamically populated time slots cells -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL: EVENT EDITOR / MANUALLY ADD EVENT
+       ========================================== -->
+  <div class="modal-overlay" id="event-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-heading">Edit Roster Block</h3>
+        <button class="btn-close-modal" id="btn-close-modal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="modal-event-id">
+        
+        <div class="form-group">
+          <label class="form-label" for="modal-title">Subject / Class / Task Name</label>
+          <input type="text" id="modal-title" class="input-control" placeholder="e.g. MATH 101 - Calculus">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label class="form-label" for="modal-day">Day of the Week</label>
+            <select id="modal-day" class="input-control">
+              <option value="1">Monday</option>
+              <option value="2">Tuesday</option>
+              <option value="3">Wednesday</option>
+              <option value="4">Thursday</option>
+              <option value="5">Friday</option>
+              <option value="6">Saturday</option>
+              <option value="7">Sunday</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="modal-emoji">Emoji Icon</label>
+            <input type="text" id="modal-emoji" class="input-control" placeholder="✏️" readonly style="cursor: pointer;">
+            <!-- Simple Popover of common icons -->
+            <div class="emoji-picker-container" id="emoji-picker">
+              <div class="emoji-option" data-emoji="📚">📚</div>
+              <div class="emoji-option" data-emoji="🔬">🔬</div>
+              <div class="emoji-option" data-emoji="💻">💻</div>
+              <div class="emoji-option" data-emoji="🎨">🎨</div>
+              <div class="emoji-option" data-emoji="🏋️">🏋️</div>
+              <div class="emoji-option" data-emoji="⏰">⏰</div>
+              <div class="emoji-option" data-emoji="☕">☕</div>
+              <div class="emoji-option" data-emoji="📝">📝</div>
+              <div class="emoji-option" data-emoji="🧠">🧠</div>
+              <div class="emoji-option" data-emoji="🧬">🧬</div>
+              <div class="emoji-option" data-emoji="⚖️">⚖️</div>
+              <div class="emoji-option" data-emoji="🌍">🌍</div>
+              <div class="emoji-option" data-emoji="🎭">🎭</div>
+              <div class="emoji-option" data-emoji="🍔">🍔</div>
+              <div class="emoji-option" data-emoji="💼">💼</div>
+              <div class="emoji-option" data-emoji="✈️">✈️</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label class="form-label" for="modal-start-time">Start Time</label>
+            <input type="time" id="modal-start-time" class="input-control" value="09:00">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="modal-end-time">End Time</label>
+            <input type="time" id="modal-end-time" class="input-control" value="10:30">
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label class="form-label" for="modal-location">Location / Room</label>
+            <input type="text" id="modal-location" class="input-control" placeholder="e.g. Hall B / Zoom">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="modal-instructor">Teacher / Notes</label>
+            <input type="text" id="modal-instructor" class="input-control" placeholder="e.g. Dr. Roberts">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Theme Color Tag</label>
+          <div class="color-swatch-picker" id="color-picker">
+            <div class="color-swatch active" style="background-color: #6366f1;" data-color="#6366f1" data-color-rgb="99, 102, 241"></div>
+            <div class="color-swatch" style="background-color: #ec4899;" data-color="#ec4899" data-color-rgb="236, 72, 153"></div>
+            <div class="color-swatch" style="background-color: #10b981;" data-color="#10b981" data-color-rgb="16, 185, 129"></div>
+            <div class="color-swatch" style="background-color: #f59e0b;" data-color="#f59e0b" data-color-rgb="245, 158, 11"></div>
+            <div class="color-swatch" style="background-color: #3b82f6;" data-color="#3b82f6" data-color-rgb="59, 130, 246"></div>
+            <div class="color-swatch" style="background-color: #8b5cf6;" data-color="#8b5cf6" data-color-rgb="139, 92, 246"></div>
+            <div class="color-swatch" style="background-color: #ef4444;" data-color="#ef4444" data-color-rgb="239, 68, 68"></div>
+            <div class="color-swatch" style="background-color: #06b6d4;" data-color="#06b6d4" data-color-rgb="6, 182, 212"></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-delete-modal-event" class="btn btn-danger" style="margin-right: auto; display: none;">
+          <i class="fa-solid fa-trash-can"></i> Delete
+        </button>
+        <button id="btn-cancel-modal" class="btn btn-secondary">Cancel</button>
+        <button id="btn-save-modal-event" class="btn btn-primary">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CDN scripts -->
+  <!-- Tesseract OCR script CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.0.3/dist/tesseract.min.js"></script>
+  <!-- html2pdf bundle CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5xIQmUs136RK77Ospip3zTskLkOHgOmipjDSmZxufyGj13NsLbqQP94VGM1S54pkZt1sL2gxg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <!-- Core Javascript Application Logic -->
+  <script src="app.js"></script>
+</body>
+</html>
